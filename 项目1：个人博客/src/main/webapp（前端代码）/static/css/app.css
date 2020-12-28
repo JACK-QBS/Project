@@ -1,0 +1,26 @@
+#article_list_container {
+	margin: 50px auto 20px auto;
+	padding: 0;
+}
+
+#article_list_div {
+	margin-top: 20px;
+}
+
+#article_content {
+	margin: 10px auto 0 auto;
+	padding: 0;
+}
+
+input[type="text"], input[type="password"] {
+	padding-left: 26px;
+}
+
+.checkbox {
+	padding-left: 21px;
+}
+
+.modal-content {
+	width: fit-content;
+	padding: 0.2rem 0.4rem;
+}
