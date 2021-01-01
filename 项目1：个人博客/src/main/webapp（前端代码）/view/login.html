@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>登录页面</title>
+    <script type="text/javascript" src="../static/jquery/jquery-1.12.4.js"></script>
+    <script type="text/javascript" src="../js/app.js"></script>
+</head>
+<body>
+<h2>登录页面</h2>
+    <!--action为上下文路径,enctype为表单提交格式-->
+    <form id="login_form" method="post" action="../login" enctype="application/x-www-form-urlencoded">
+        <!--text表示文本框，name表示发请求数据的键值对，placeholder表示水印-->
+        <input id="username" type="text" name="username" placeholder="请输入用户名"><br><br>
+        <input id="password" type="password" name="password" placeholder="请输入密码"><br><br>
+        <input type="submit" value="登录">
+    </form>
+</body>
+</html>
