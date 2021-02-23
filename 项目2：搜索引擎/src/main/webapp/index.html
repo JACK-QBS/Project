@@ -1,0 +1,97 @@
+<html>
+<head>
+    <!-- Bootstrap 文档: https://v3.bootcss.com/css/ -->
+    <!-- Vue 文档: https://cn.vuejs.org/v2/guide/ -->
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap ui框架的CSS样式 -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+    <title>Java API 搜索</title>
+    <style>
+    #app {
+        margin-left:50px;
+        margin-right:50px;
+    }
+    div button {
+        width:100%;
+    }
+    .row {
+        padding-top: 10px;
+    }
+    .col-md-5,.col-md-1 {
+        padding-left:2;
+        padding-right:2;
+    }
+    .title {
+        font-size: 22px;
+    }
+    .desc {
+        font-size: 18px;
+    }
+    .url {
+        font-size: 18px;
+        color: green;
+    }
+    </style>
+</head>
+<body>
+<!-- vuejs：js框架，提供html中，dom元素的便捷操作：绑定事件，属性，内容 -->
+<div id="app">
+    <div class="row">我是 logo</div>
+    <div class="row">
+        <div class="col-md-5">
+            <!-- 搜索框绑定变量，修改 68 行query的值 -->
+            <input type="text" class="form-control" placeholder="请输入关键字" v-model="query">
+        </div>
+        <div class="col-md-1">
+            <!-- 搜索按钮绑定方法， 69行的results方法 -->
+            <button class="btn btn-success" v-on:click="search()">搜索</button>
+        </div>
+    </div>
+    <div class="row" v-for="result in results">
+        <!--用来存放结果-->
+        <div class="title"><a v-bind:href="result.url">{{result.title}}</a></div>
+        <div class="desc">{{result.desc}}</div>
+        <div class="url">{{result.url}}</div>
+    </div>
+    <p v-if="msg.length>0" style="color: red">{{msg}}</p>
+</div>
+</body>
+<script src="https://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/vue"></script>
+<script>
+
+    var vm = new Vue({
+        el: "#app",
+        data: {
+            query: "",
+            results: [ ],
+            msg: ""
+        },
+        methods: {
+            search() {
+                //发ajax请求
+                $.ajax({
+                    url:"search?query=" + this.query,
+                    type: "get",
+                    context: this,
+                    success: function(respData, status) {
+                        if (respData.ok) {
+                            this.results = respData.data;
+                            this.msg = "";
+                        } else {
+                            this.results = [];
+                            this.msg = respData.msg;
+                        }
+
+                    }
+                })
+            },
+        }
+    })
+  </script>
+</html>
