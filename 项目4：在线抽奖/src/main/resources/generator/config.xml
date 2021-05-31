@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE generatorConfiguration
+        PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN"
+        "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd">
+<!-- mybatis 生成工具配置文件 -->
+<generatorConfiguration>
+
+    <!-- 引入某个配置文件的信息，以 ${键} 的方式获取值 -->
+    <properties resource="application.properties" />
+
+    <context id="Mysql" defaultModelType="flat" targetRuntime="MyBatis3">
+
+        <!-- 表名或字段名为关键字的时候，生成的sql中给表名或字段名添加分隔符 ` -->
+        <property name="beginningDelimiter" value="true" />
+        <property name="endingDelimiter" value="true" />
+
+        <!-- 生成的Java文件的编码 -->
+        <property name="javaFileEncoding" value="UTF-8"/>
+
+        <!-- 自定义插件：Mapper不生成方法，指定父接口来继承使用 -->
+        <plugin type="org.example.tool.DefaultGeneratorPlugin">
+            <property name="rootMappers" value="org.example.base.BaseMapper" />
+            <property name="lombok" value="Getter,Setter,ToString"/>
+        </plugin>
+
+        <!-- 自定义插件：生成的XML文件会覆盖已有文件 -->
+        <plugin type="org.example.tool.OverIsMergeablePlugin" />
+
+        <!-- 自定义注释插件：生成的实体类中，根据表和字段的comment生成注释 -->
+        <commentGenerator type="org.example.tool.DefaultCommentGenerator" />
+
+        <!-- JDBC连接配置 -->
+        <jdbcConnection driverClass="${spring.datasource.driver-class-name}"
+                        connectionURL="${spring.datasource.url}"
+                        userId="${spring.datasource.username}"
+                        password="${spring.datasource.password}">
+            <!-- 读取数据库表定义的注释信息 -->
+            <property name="useInformationSchema" value="true" />
+        </jdbcConnection>
+
+        <!-- 默认false，把JDBC DECIMAL 和 NUMERIC 类型解析为 Integer，
+                为 true时把JDBC DECIMAL 和 NUMERIC 类型解析为java.math.BigDecimal -->
+        <javaTypeResolver>
+            <property name="forceBigDecimals" value="false" />
+        </javaTypeResolver>
+
+        <!-- 生成实体类的配置 -->
+        <javaModelGenerator targetProject="src/test/java"
+                            targetPackage="org.example.model">
+            <!-- 指定需要继承的父类 -->
+            <!--            <property name="rootClass" value="org.example.base.BaseEntity"/>-->
+        </javaModelGenerator>
+
+        <!-- 生成XML文件的配置 -->
+        <sqlMapGenerator targetProject="src/test/resources"
+                         targetPackage="mapper">
+        </sqlMapGenerator>
+
+        <!-- 生成Mapper接口配置 -->
+        <javaClientGenerator type="XMLMAPPER"
+                             targetProject="src/test/java"
+                             targetPackage="org.example.mapper">
+            <!-- 指定要继承的父接口 -->
+            <!--            <property name="rootInterface" value="org.example.base.BaseMapper"/>-->
+        </javaClientGenerator>
+
+        <!-- 需要生成的表，%表示模糊匹配，也可以指定具体的表名 -->
+        <table tableName="%"
+               enableCountByExample="false"
+               enableDeleteByExample="false"
+               enableSelectByExample="false"
+               enableUpdateByExample="false"
+        >
+            <!-- insert方法通过自增主键插入数据后，主键值是否设置到对象属性中 -->
+            <generatedKey column="id" sqlStatement="JDBC"/>
+            <!-- 字段覆盖：表中content字段为text数据类型时，默认会生成为二进制，可以指定为字符串 -->
+<!--            <columnOverride column="content" jdbcType="VARCHAR" />-->
+        </table>
+    </context>
+</generatorConfiguration>
