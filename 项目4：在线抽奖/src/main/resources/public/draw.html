@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta http-equiv="X-UA-Compatible" content="ie=edge"/>
+    <title>在线抽奖</title>
+    <link rel="stylesheet" href="3rd/element-ui@2.13.2/lib/theme-chalk/index.css"/>
+    <link rel="stylesheet" href="css/app.css"/>
+    <link rel="stylesheet" href="css/style.css"/>
+    <link rel="stylesheet" href="css/reset.css"/>
+</head>
+<body>
+<div id="app" class="bg" v-cloak>
+    <div class="next title" v-if="awards[currentAwardIndex]">
+        <span class="title">
+          {{ awards[currentAwardIndex].name }}
+          ({{!result[currentAwardIndex] ? 0 : result[currentAwardIndex].length}}/{{awards[currentAwardIndex].count}})
+        </span>
+        <span v-show="awards[currentAwardIndex]"
+        >, 奖品：{{ awards[currentAwardIndex].award }}</span
+        >
+    </div>
+    <div style="text-align: right;">
+        <el-link href="setting.html" type="primary" style="margin: 30px;">返回抽奖设置</el-link>
+
+    </div>
+    <div class="batch flexbox"
+         v-show="showCurrent">
+        <div class="player" v-for="(item, index) in awardLuckyPlayers" :key="index" @click="onKick(item)">
+            {{ item.name }}
+        </div>
+    </div>
+    <template v-if="!running && !goOn">
+        <div class="result">
+            <!-- 使用el-collapse-transition标签包裹着需要折叠的元素 -->
+            <el-button size="small" type="primary" v-if="showResultButton" @click="toggleResult">本奖项所有中奖人员</el-button>
+            <div v-show="showResult" style="width: 300px; margin-top: 10px;">
+                <el-collapse-transition>
+                    <div>
+                        <div
+                                @click="onKick(item, index)"
+                                class="lucky-dog"
+                                v-for="(item, index) in result[currentAwardIndex]"
+                                :key="index"
+                        >
+                            {{ item.name }}
+                        </div>
+                    </div>
+                </el-collapse-transition>
+            </div>
+        </div>
+    </template>
+    <div id="myCanvasContainer">
+        <canvas id="myCanvas" ref="canvas" style="width: 100%; height: 100%">
+            <p>换个现代浏览器吧！</p>
+        </canvas>
+    </div>
+    <div id="tags">
+        <ul>
+            <li v-for="(item, index) in members" :key="index">
+                <a href="#" target="_blank">{{ item.name }}</a>
+            </li>
+        </ul>
+    </div>
+    <div class="buttons">
+        <el-select v-model="currentAwardIndex" size="small" style="width: 180px;">
+            <el-option
+                    v-for="(item, index) in awards"
+                    :key="index"
+                    :label="item.name"
+                    :value="index"
+            ></el-option>
+        </el-select>
+        <el-button size="small" @click="toggle" ref="action" :disabled="disabledToggle" type="primary">
+            {{ toggleButtonText }}
+        </el-button>
+        <el-button size="small" @click="goNext" :disabled="running || currentAwardIndex == awards.length-1"
+                   type="success">下一轮
+        </el-button>
+        <el-button
+                size="small"
+                :disabled="running"
+                type="warning"
+                size="small"
+                class="el-icon-refresh"
+                @click="onReplay"
+                circle
+        ></el-button>
+        <span style="color: #fff; margin-left:10px;">{{players.length}}</span>
+    </div>
+</div>
+<script src="3rd/polyfill.min.js"></script>
+<script src="3rd/tagcanvas.min.js"></script>
+<script src="3rd/vue.min.js"></script>
+<script src="3rd/element-ui@2.13.2/lib/index.js"></script>
+<script src="3rd/axios.min.js"></script>
+<script src="js/util.js"></script>
+<script src="js/draw.js"></script>
+</body>
+</html>
