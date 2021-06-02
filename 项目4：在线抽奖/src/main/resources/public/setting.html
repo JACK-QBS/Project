@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta http-equiv="X-UA-Compatible" content="ie=edge"/>
+    <title>奖项设置</title>
+    <link rel="stylesheet" href="3rd/element-ui@2.13.2/lib/theme-chalk/index.css"/>
+    <link rel="stylesheet" href="css/app.css"/>
+    <link rel="stylesheet" href="css/reset.css"/>
+    <style>
+        .el-input {
+            width: 120px;
+        }
+
+        * {
+            cursor: initial;
+        }
+
+        .awards,
+        .members {
+            width: 80%;
+            margin: 40px auto;
+        }
+
+        h1 {
+            font-size: 30px;
+            text-align: center;
+            line-height: 1.5;
+            margin-bottom: 20px;
+        }
+
+        h1 span {
+            font-size: 16px;
+        }
+
+        a {
+            text-decoration: underline;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+<div id="app" v-cloak>
+    <div class="awards">
+        <h1>
+            奖项设置<span>（请按抽奖顺序添加）</span>
+            <div style="float: right; vertical-align: middle; padding: 0">
+                <el-dropdown @command="handleCommand">
+                    <span style="cursor: pointer; color: #409EFF;">
+                        欢迎您：{{user.nickname || user.username}}
+                        <i class="el-icon-arrow-down el-icon--right"></i>
+                    </span>
+                    <el-dropdown-menu slot="dropdown">
+                        <el-dropdown-item command="userInfo">个人信息</el-dropdown-item>
+                        <el-dropdown-item disabled>设置</el-dropdown-item>
+                        <el-dropdown-item divided command="logout">注销</el-dropdown-item>
+                    </el-dropdown-menu>
+                </el-dropdown>
+                <el-avatar
+                        v-if="user.head"
+                        :src="user.head"
+                        size="small"
+                        style="margin-left: 5px;"
+                >
+                </el-avatar>
+            </div>
+        </h1>
+        <el-form ref="award-form" :model="awards" :rules="awards.rules">
+            <el-table :data="awards.data" style="width: 100%">
+                <el-table-column
+                        prop="name"
+                        label="名称"
+                        width="240"
+                >
+                    <template slot-scope="scope">
+                        <div>
+                            <div v-if="scope.row.action == 'view'">
+                                {{ scope.row.name || '-' }}
+                            </div>
+                            <div v-else>
+                                <el-form-item
+                                        :prop="'data.' + scope.$index + '.name'"
+                                        :rules="awards.rules.name">
+                                    <el-input
+                                            v-bind:id="'award-' + scope.$index + '-name'"
+                                            size="mini"
+                                            v-model="scope.row.name"
+                                    ></el-input>
+                                </el-form-item>
+                            </div>
+                        </div>
+                    </template>
+                </el-table-column>
+                <el-table-column
+                        prop="count"
+                        label="数量"
+                        width="180"
+                >
+                    <template slot-scope="scope">
+                        <div>
+                            <div v-if="scope.row.action == 'view'">
+                                {{ scope.row.count || '-' }}
+                            </div>
+                            <div v-else>
+                                <el-form-item
+                                        :prop="'data.' + scope.$index + '.count'"
+                                        :rules="awards.rules.count">
+                                    <el-input
+                                            v-bind:id="'award-' + scope.$index + '-count'"
+                                            size="mini"
+                                            v-model.number="scope.row.count"
+                                    ></el-input>
+                                </el-form-item>
+                            </div>
+                        </div>
+                    </template>
+                </el-table-column>
+                <el-table-column
+                        prop="award"
+                        label="奖品"
+                        width="180"
+                >
+                    <template slot-scope="scope">
+                        <div>
+                            <div v-if="scope.row.action == 'view'">
+                                {{ scope.row.award || '-' }}
+                            </div>
+                            <div v-else>
+                                <el-form-item
+                                        :prop="'data.' + scope.$index + '.award'"
+                                        :rules="awards.rules.award">
+                                    <el-input
+                                            v-bind:id="'award-' + scope.$index + '-award'"
+                                            size="mini"
+                                            v-model="scope.row.award"
+                                    ></el-input>
+                                </el-form-item>
+                            </div>
+                        </div>
+                    </template>
+                </el-table-column>
+                <el-table-column prop="operation" label="操作">
+                    <template slot-scope="scope">
+                        <template v-if="scope.row.action == 'view'">
+                            <el-button
+                                    size="small"
+                                    @click="clickModifyAward(scope.$index)"
+                                    type="primary"
+                            >修改
+                            </el-button>
+                            <el-button
+                                    size="small"
+                                    @click="deleteAward(scope.$index)"
+                                    type="danger"
+                            >删除
+                            </el-button>
+                        </template>
+                        <template v-else-if="scope.row.action == 'add' || scope.row.action == 'update'">
+                            <el-button
+                                    size="small"
+                                    @click="saveAward(scope.$index)"
+                                    type="success"
+                            >保存
+                            </el-button>
+                            <el-button
+                                    size="small"
+                                    @click="cancelAward(scope.$index)"
+                                    type="info"
+                            >取消
+                            </el-button>
+                        </template>
+                    </template>
+                </el-table-column>
+            </el-table>
+        </el-form>
+        <div style="width: 100%; margin: 20px 0 0 0;">
+            <el-button
+                    size="small"
+                    type="primary"
+                    @click="clickAddAward"
+            >增加
+            </el-button>
+        </div>
+        <div style="width: 100%; margin: 20px 0 0 0;">
+            <span>每个奖项每次抽取人数：</span>
+            <el-select size="small" v-model="batchNumber" @change="onChange">
+                <el-option
+                        v-for="index in 20"
+                        :key="index"
+                        :label="index"
+                        :value="index"
+                ></el-option>
+            </el-select>
+            <el-button size="small" type="danger" @click="onReset" style="margin-left: 10px;"
+            >重置中奖结果
+            </el-button
+            >
+            <a href="draw.html" style="margin-left: 10px;">去抽奖</a>
+        </div>
+    </div>
+    <div class="members">
+        <h1>参与人员列表(共{{members.data.length}}人)</h1>
+        <el-form ref="member-form" :model="members" :rules="members.rules">
+            <el-table :data="members.data" style="width: 100%">
+                <el-table-column
+                        prop="name"
+                        label="姓名"
+                        width="240"
+                >
+                    <template slot-scope="scope">
+                        <div>
+                            <div v-if="scope.row.action == 'view'">
+                                {{ scope.row.name || '-' }}
+                            </div>
+                            <div v-else>
+                                <el-form-item
+                                        :prop="'data.' + scope.$index + '.name'"
+                                        :rules="members.rules.name">
+                                    <el-input
+                                            v-bind:id="'member-' + scope.$index + '-name'"
+                                            size="mini"
+                                            v-model="scope.row.name"
+                                    ></el-input>
+                                </el-form-item>
+                            </div>
+                        </div>
+                    </template>
+                </el-table-column>
+                <el-table-column
+                        prop="no"
+                        label="工号"
+                        width="180"
+                >
+                    <template slot-scope="scope">
+                        <div>
+                            <div v-if="scope.row.action == 'view'">
+                                {{ scope.row.no || '-' }}
+                            </div>
+                            <div v-else>
+                                <el-form-item
+                                        :prop="'data.' + scope.$index + '.no'"
+                                        :rules="members.rules.no">
+                                    <el-input
+                                            v-bind:id="'member-' + scope.$index + '-no'"
+                                            size="mini"
+                                            v-model="scope.row.no"
+                                    ></el-input>
+                                </el-form-item>
+                            </div>
+                        </div>
+                    </template>
+                </el-table-column>
+                <el-table-column prop="operation" label="操作">
+                    <template slot-scope="scope">
+                        <template v-if="scope.row.action == 'view'">
+                            <el-button
+                                    size="small"
+                                    @click="clickModifyMember(scope.$index)"
+                                    type="primary"
+                            >修改
+                            </el-button>
+                            <el-button
+                                    size="small"
+                                    @click="deleteMember(scope.$index)"
+                                    type="danger"
+                            >删除
+                            </el-button>
+                        </template>
+                        <template v-else-if="scope.row.action == 'add' || scope.row.action == 'update'">
+                            <el-button
+                                    size="small"
+                                    @click="saveMember(scope.$index)"
+                                    type="success"
+                            >保存
+                            </el-button>
+                            <el-button
+                                    size="small"
+                                    @click="cancelMember(scope.$index)"
+                                    type="info"
+                            >取消
+                            </el-button>
+                        </template>
+                    </template>
+                </el-table-column>
+            </el-table>
+        </el-form>
+        <el-button
+                size="small"
+                type="primary"
+                @click="clickAddMember"
+                style="margin: 20px 0;"
+        >增加
+        </el-button>
+    </div>
+</div>
+<script src="3rd/polyfill.min.js"></script>
+<script src="3rd/vue.min.js"></script>
+<script src="3rd/element-ui@2.13.2/lib/index.js"></script>
+<script src="3rd/axios.min.js"></script>
+<script src="js/util.js"></script>
+<script src="js/setting.js"></script>
+</body>
+</html>
