@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta http-equiv="X-UA-Compatible" content="ie=edge"/>
+    <title>用户登录</title>
+    <link rel="stylesheet" href="3rd/element-ui@2.13.2/lib/theme-chalk/index.css"/>
+    <link rel="stylesheet" href="css/app.css"/>
+    <link rel="stylesheet" href="css/index.css"/>
+</head>
+<body>
+<div id="app">
+    <template v-if="activeForm==='login-form'">
+        <div class="login-container">
+            <el-form ref="login-form" :model="loginForm" :rules="loginRules" class="login-page" status-icon>
+                <h3 style="color: royalblue;">用户登录</h3>
+                <el-form-item prop="username" :rules="loginRules.username">
+                    <el-input type="text"
+                              v-model="loginForm.username"
+                              prefix-icon="el-icon-user-solid"
+                              placeholder="请输入用户名"
+                    ></el-input>
+                </el-form-item>
+                <el-form-item prop="password" :rules="loginRules.password">
+                    <el-input type="password"
+                              v-model="loginForm.password"
+                              prefix-icon="el-icon-lock"
+                              placeholder="请输入密码"
+                              show-password="true"
+                    ></el-input>
+                </el-form-item>
+
+                <el-row style="padding: 0; margin: 0 0 15px 0;" :gutter="20">
+                    <el-col :span="13" style="padding: 0;">
+                        <el-checkbox
+                                v-model="rememberMe"
+                                class="remember-me"
+                        >记住密码
+                        </el-checkbox>
+                    </el-col>
+                    <el-col :span="5" :offset="1" style="padding: 0; text-align: right;">
+                        <el-link type="primary">忘记密码</el-link>
+                    </el-col>
+                    <el-col :span="5" :offset="0" style="padding: 0; text-align: right;">
+                        <el-link type="primary" @click="toggle('register-form')">用户注册</el-link>
+                    </el-col>
+                </el-row>
+                <el-button type="primary" style="width:100%;" @click="login" :loading="loginLoading">登录</el-button>
+<!--                <el-link type="primary" @click="toggle('register-form')" style="margin-top: 10px;">用户注册</el-link>-->
+            </el-form>
+        </div>
+    </template>
+    <template v-else>
+        <div class="register-container">
+            <el-form ref="register-form" :model="registerForm" :rules="registerRules" class="login-page" status-icon>
+                <h3 style="color: limegreen;">用户注册</h3>
+                <el-form-item prop="username" :rules="registerRules.username">
+                    <el-input type="text"
+                              v-model="registerForm.username"
+                              prefix-icon="el-icon-user-solid"
+                              placeholder="请输入用户名"
+                    ></el-input>
+                </el-form-item>
+                <el-form-item prop="password" :rules="registerRules.password">
+                    <el-input type="password"
+                              v-model="registerForm.password"
+                              prefix-icon="el-icon-lock"
+                              placeholder="请输入密码"
+                              show-password="true"
+                    ></el-input>
+                </el-form-item>
+                <el-form-item prop="checkPassword" :rules="registerRules.checkPassword">
+                    <el-input type="password"
+                              v-model="registerForm.checkPassword"
+                              prefix-icon="el-icon-circle-check"
+                              placeholder="确认密码"
+                              show-password="true"
+                    ></el-input>
+                </el-form-item>
+                <el-form-item prop="email" :rules="registerRules.email">
+                    <el-input type="text"
+                              v-model="registerForm.email"
+                              prefix-icon="el-icon-message"
+                              placeholder="请输入邮箱"
+                    ></el-input>
+                </el-form-item>
+                <el-form-item>
+                    <el-input type="text"
+                              v-model="registerForm.nickname"
+                              prefix-icon="el-icon-coffee-cup"
+                              placeholder="请输入昵称"
+                    ></el-input>
+                </el-form-item>
+                <el-form-item prop="age" :rules="registerRules.age">
+                    <el-input type="text"
+                              v-model.number="registerForm.age"
+                              prefix-icon="el-icon-set-up"
+                              placeholder="请输入年龄"
+                    ></el-input>
+                </el-form-item>
+                <el-form-item prop="headFile" :rules="registerRules.headFile">
+                    <el-upload
+                            action="#"
+                            :accept="acceptImageType(true).join(',')"
+                            list-type="picture"
+                            :show-file-list="false"
+                            :auto-upload="false"
+                            :on-change="changeHead"
+                            style="display: inline-block;"
+                    >
+                        <el-button size="small" type="primary">选择头像</el-button>
+                    </el-upload>
+                    <div style="display: inline-block; float: right; width: 80px; padding: 0;">
+                        <el-avatar
+                                v-if="!headBlobPath"
+                                icon="el-icon-user-solid"
+                                style="display: inline-block;"
+                                size="small"
+                        >
+                        </el-avatar>
+                        <div v-else>
+                            <img :src="headBlobPath" class="el-avatar el-avatar--small el-avatar--icon el-avatar--circle">
+                            <span class="el-upload-list__item-actions">
+                                <span @click="previewHead" class="el-upload-list__item-preview">
+                                    <i class="el-icon-zoom-in"></i>
+                                </span>
+                                <span @click="removeHead">
+                                    <i class="el-icon-delete"></i>
+                                </span>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="el-upload__tip" style="line-height: 10px;">
+                        只能上传{{acceptImageType().join('/')}}文件，且不超过500kb
+                    </div>
+                    <el-dialog :visible.sync="headVisible">
+                        <img width="100%" :src="headBlobPath">
+                    </el-dialog>
+                </el-form-item>
+                <el-button type="success" style="width:100%;" @click="register" :loading="registerLoading">注册</el-button>
+                <el-link type="primary" @click="toggle('login-form')" style="margin-top: 10px;">返回登录</el-link>
+            </el-form>
+        </div>
+    </template>
+</div>
+<script src="3rd/polyfill.min.js"></script>
+<script src="3rd/vue.min.js"></script>
+<script src="3rd/element-ui@2.13.2/lib/index.js"></script>
+<script src="3rd/axios.min.js"></script>
+<script src="js/util.js"></script>
+<script src="js/index.js"></script>
+</body>
+</html>
