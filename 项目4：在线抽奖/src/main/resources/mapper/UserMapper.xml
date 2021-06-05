@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.example.mapper.UserMapper">
+  <resultMap id="BaseResultMap" type="org.example.model.User">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="username" jdbcType="VARCHAR" property="username" />
+    <result column="password" jdbcType="VARCHAR" property="password" />
+    <result column="nickname" jdbcType="VARCHAR" property="nickname" />
+    <result column="email" jdbcType="VARCHAR" property="email" />
+    <result column="age" jdbcType="INTEGER" property="age" />
+    <result column="head" jdbcType="VARCHAR" property="head" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="setting_id" property="settingId"/>
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, username, password, nickname, email, age, head, create_time
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from user
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from user
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" keyColumn="id" keyProperty="id" parameterType="org.example.model.User" useGeneratedKeys="true">
+    insert into user (username, password, nickname, 
+      email, age, head, create_time
+      )
+    values (#{username,jdbcType=VARCHAR}, #{password,jdbcType=VARCHAR}, #{nickname,jdbcType=VARCHAR}, 
+      #{email,jdbcType=VARCHAR}, #{age,jdbcType=INTEGER}, #{head,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}
+      )
+  </insert>
+  <insert id="insertSelective" keyColumn="id" keyProperty="id" parameterType="org.example.model.User" useGeneratedKeys="true">
+    insert into user
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="username != null">
+        username,
+      </if>
+      <if test="password != null">
+        password,
+      </if>
+      <if test="nickname != null">
+        nickname,
+      </if>
+      <if test="email != null">
+        email,
+      </if>
+      <if test="age != null">
+        age,
+      </if>
+      <if test="head != null">
+        head,
+      </if>
+      <if test="createTime != null">
+        create_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="username != null">
+        #{username,jdbcType=VARCHAR},
+      </if>
+      <if test="password != null">
+        #{password,jdbcType=VARCHAR},
+      </if>
+      <if test="nickname != null">
+        #{nickname,jdbcType=VARCHAR},
+      </if>
+      <if test="email != null">
+        #{email,jdbcType=VARCHAR},
+      </if>
+      <if test="age != null">
+        #{age,jdbcType=INTEGER},
+      </if>
+      <if test="head != null">
+        #{head,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null">
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="org.example.model.User">
+    update user
+    <set>
+      <if test="username != null">
+        username = #{username,jdbcType=VARCHAR},
+      </if>
+      <if test="password != null">
+        password = #{password,jdbcType=VARCHAR},
+      </if>
+      <if test="nickname != null">
+        nickname = #{nickname,jdbcType=VARCHAR},
+      </if>
+      <if test="email != null">
+        email = #{email,jdbcType=VARCHAR},
+      </if>
+      <if test="age != null">
+        age = #{age,jdbcType=INTEGER},
+      </if>
+      <if test="head != null">
+        head = #{head,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null">
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="org.example.model.User">
+    update user
+    set username = #{username,jdbcType=VARCHAR},
+      password = #{password,jdbcType=VARCHAR},
+      nickname = #{nickname,jdbcType=VARCHAR},
+      email = #{email,jdbcType=VARCHAR},
+      age = #{age,jdbcType=INTEGER},
+      head = #{head,jdbcType=VARCHAR},
+      create_time = #{createTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+
+
+  <!-- 自定义的seq -->
+  <!-- 用户登录在数据库中查找该用户信息 -->
+  <select id="query" resultMap="BaseResultMap">
+    select
+    u.id,
+    u.username,
+    u.password,
+    u.nickname,
+    u.email,
+    u.age,
+    u.head,
+    u.create_time,
+    s.id setting_id
+    from user u
+        join setting s on u.id=s.user_id
+        where u.username=#{username}
+  </select>
+</mapper>
