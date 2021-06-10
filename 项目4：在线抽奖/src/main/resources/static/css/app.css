@@ -1,0 +1,15 @@
+.err{
+    width: auto;
+    max-width: 1000px;
+    overflow: auto;
+    padding: 20px 30px 30px 30px;
+}
+.err-row{
+    margin-bottom: 10px;
+}
+.err-tag{
+    margin-right: 20px;
+}
+[v-cloak] {
+    display:none !important;
+}

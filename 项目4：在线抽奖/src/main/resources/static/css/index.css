@@ -1,0 +1,31 @@
+html, body, #app {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: auto;
+}
+
+body{
+    background: url(../img/index.jpg) no-repeat 100% 100%;
+    background-size: cover;
+    height: 100%;
+}
+
+.login-container, .register-container {
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+}
+.login-page {
+    -webkit-border-radius: 5px;
+    border-radius: 5px;
+    margin: 50px auto;
+    width: 360px;
+    padding: 20px 40px 40px;
+    background: #fff;
+    border: 1px solid #eaeaea;
+    box-shadow: 0 0 25px #cac6c6;
+}
+label.el-col {
+    padding: 0;
+}
